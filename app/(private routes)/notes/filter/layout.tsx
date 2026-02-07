@@ -1,4 +1,4 @@
-import css from '@/app/(private-routes)/notes/filter/LayoutNotes.module.css';
+import css from '@/app/(privater outes)/notes/filter/LayoutNotes.module.css';
 
 type NotesLayoutProps = {
   children: React.ReactNode;

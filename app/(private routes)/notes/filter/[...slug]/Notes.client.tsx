@@ -1,6 +1,6 @@
 'use client';
 
-import css from '@/app/(private-routes)/notes/filter/[...slug]/NotesPage.module.css';
+import css from '@/app/(private routes)/notes/filter/[...slug]/NotesPage.module.css';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDebounce } from 'use-debounce';

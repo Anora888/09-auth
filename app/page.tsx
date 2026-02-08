@@ -1,5 +1,6 @@
 import css from './Home.module.css';
 
+
 export default function HomePage() {
   return (
     <main className={css.main}>
@@ -19,4 +20,5 @@ export default function HomePage() {
       </div>
     </main>
   );
+  
 }

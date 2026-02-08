@@ -1,8 +1,7 @@
 import { api } from './api';
+import { cookies } from 'next/headers';
 import { User } from '@/types/user';
 import { Note } from '@/types/note';
-import { FetchNotesParams, FetchNotesResponse } from './clientApi';
-import { cookies } from 'next/headers';
 
 async function getHeaders() {
   const cookieStore = await cookies();
@@ -11,14 +10,14 @@ async function getHeaders() {
   };
 }
 
-export async function fetchNotes(
-  params: FetchNotesParams
-): Promise<FetchNotesResponse> {
+export async function fetchNotes(params: {
+  page: number;
+  perPage: number;
+  search?: string;
+  tag?: string;
+}) {
   const headers = await getHeaders();
-  const { data } = await api.get<FetchNotesResponse>('/notes', {
-    params,
-    headers,
-  });
+  const { data } = await api.get('/notes', { params, headers });
   return data;
 }
 
@@ -37,11 +36,12 @@ export async function getMe(): Promise<User> {
 export async function checkSession(): Promise<{ success: boolean }> {
   try {
     const headers = await getHeaders();
-    const { data } = await api.get<{ success: boolean }>('/auth/session', {
-      headers,
-    });
+    const { data } = await api.get<{ success: boolean }>(
+      '/auth/session',
+      { headers }
+    );
     return data;
-  } catch (error) {
+  } catch {
     return { success: false };
   }
 }

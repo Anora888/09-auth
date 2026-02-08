@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useDebounce } from 'use-debounce';
 
-import { fetchNotes } from '@/lib/api';
+import { fetchNotes } from '@/lib/api/clientApi';
 import type { Note, NoteTag } from '@/types/note';
 import { TAGS } from '@/types/note';
 

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { api } from './api';
 import type { User } from '@/types/user';
 import type { Note, NoteTag, CreateNoteParams } from '@/types/note';
 
@@ -25,37 +25,28 @@ export interface FetchNotesResponse {
   totalPages: number;
 }
 
-const axiosInstance = axios.create({
-  
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://notehub-public.goit.study/api',
-});
-
 function getAuthHeaders() {
   const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-
-
 export async function register(params: RegisterParams): Promise<User> {
-
-  const { data } = await axiosInstance.post<User>('/auth/register', params);
+  const { data } = await api.post<User>('/auth/register', params);
   return data;
 }
 
 export async function login(params: LoginParams): Promise<User> {
-  const { data } = await axiosInstance.post<User>('/auth/login', params);
+  const { data } = await api.post<User>('/auth/login', params);
   return data;
 }
 
 export async function logout(): Promise<void> {
-  await axiosInstance.post('/auth/logout', {}, { headers: getAuthHeaders() });
+  await api.post('/auth/logout', {}, { headers: getAuthHeaders() });
 }
 
 export async function checkSession(): Promise<{ success: boolean }> {
   try {
-    
-    await axiosInstance.get('/users/me', { headers: getAuthHeaders() });
+    await api.get('/users/me', { headers: getAuthHeaders() });
     return { success: true };
   } catch {
     return { success: false };
@@ -63,20 +54,18 @@ export async function checkSession(): Promise<{ success: boolean }> {
 }
 
 export async function getMe(): Promise<User> {
-  const { data } = await axiosInstance.get<User>('/users/me', {
+  const { data } = await api.get<User>('/users/me', {
     headers: getAuthHeaders(),
   });
   return data;
 }
 
 export async function updateMe(payload: Partial<User>): Promise<User> {
-  const { data } = await axiosInstance.patch<User>('/users/me', payload, {
+  const { data } = await api.patch<User>('/users/me', payload, {
     headers: getAuthHeaders(),
   });
   return data;
 }
-
-
 
 export async function fetchNotes({
   page,
@@ -93,7 +82,7 @@ export async function fetchNotes({
     ...(sortBy ? { sortBy } : {}),
   };
 
-  const { data } = await axiosInstance.get<FetchNotesResponse>('/notes', {
+  const { data } = await api.get<FetchNotesResponse>('/notes', {
     params,
     headers: getAuthHeaders(),
   });
@@ -101,21 +90,21 @@ export async function fetchNotes({
 }
 
 export async function fetchNoteById(id: string): Promise<Note> {
-  const { data } = await axiosInstance.get<Note>(`/notes/${id}`, {
+  const { data } = await api.get<Note>(`/notes/${id}`, {
     headers: getAuthHeaders(),
   });
   return data;
 }
 
 export async function createNote(payload: CreateNoteParams): Promise<Note> {
-  const { data } = await axiosInstance.post<Note>('/notes', payload, {
+  const { data } = await api.post<Note>('/notes', payload, {
     headers: getAuthHeaders(),
   });
   return data;
 }
 
 export async function deleteNote(id: string): Promise<Note> {
-  const { data } = await axiosInstance.delete<Note>(`/notes/${id}`, {
+  const { data } = await api.delete<Note>(`/notes/${id}`, {
     headers: getAuthHeaders(),
   });
   return data;

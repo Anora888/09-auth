@@ -36,10 +36,9 @@ export async function getMe(): Promise<User> {
 export async function checkSession(): Promise<{ success: boolean }> {
   try {
     const headers = await getHeaders();
-    const { data } = await api.get<{ success: boolean }>(
-      '/auth/session',
-      { headers }
-    );
+    const { data } = await api.get<{ success: boolean }>('/auth/session', {
+      headers,
+    });
     return data;
   } catch {
     return { success: false };

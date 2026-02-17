@@ -1,8 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import css from './NotePreview.module.css';
 import { fetchNoteById } from '@/lib/api/clientApi';
 import Modal from '@/components/Modal/Modal';
@@ -29,7 +28,7 @@ const NotePreviewClient = () => {
 
   const formattedDate = note.updatedAt
     ? `Updated at: ${new Date(note.updatedAt).toLocaleDateString()}`
-    : `Created at: ${new Date(note.createdAt).toLocaleDateString()}}`;
+    : `Created at: ${new Date(note.createdAt).toLocaleDateString()}`;
 
   return (
     <Modal onClose={handleClose}>

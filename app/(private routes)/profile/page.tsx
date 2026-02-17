@@ -1,16 +1,14 @@
-'use client';
-
-import Link from 'next/link';
 import Image from 'next/image';
-import { useAuthStore } from '@/lib/store/authStore';
+import Link from 'next/link';
+import { getMe } from '@/lib/api/serverApi';
 import css from './ProfilePage.module.css';
 
-export default function ProfilePage() {
-  const user = useAuthStore((state) => state.user);
+export const metadata = {
+  title: 'Profile',
+};
 
-  if (!user) {
-    return null; // Or loader/redirect, but AuthProvider handles redirect
-  }
+export default async function ProfilePage() {
+  const user = await getMe();
 
   return (
     <main className={css.mainContent}>
@@ -21,6 +19,7 @@ export default function ProfilePage() {
             Edit Profile
           </Link>
         </div>
+
         <div className={css.avatarWrapper}>
           <Image
             src={user.avatar}
@@ -31,6 +30,7 @@ export default function ProfilePage() {
             priority
           />
         </div>
+
         <div className={css.profileInfo}>
           <p>Username: {user.username}</p>
           <p>Email: {user.email}</p>

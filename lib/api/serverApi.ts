@@ -44,6 +44,7 @@ export async function fetchNoteById(id: string): Promise<Note> {
 
   return data;
 }
+
 export async function fetchNotes(params: {
   page: number;
   perPage: number;

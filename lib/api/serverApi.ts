@@ -13,6 +13,7 @@ async function getHeaders() {
   return {
     Cookie: cookieStore.toString(),
   };
+  
 }
 
 export async function fetchNotes(params: {

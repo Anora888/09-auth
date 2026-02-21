@@ -19,16 +19,30 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/profile') ||
     pathname.startsWith('/notes');
 
-  // Якщо нема accessToken, але є refreshToken → пробуємо відновити
-  if (!accessToken && refreshToken) {
-    const session = await checkSession();
+   const response = NextResponse.next();
+if (!accessToken && refreshToken) {
+  try {
+    const sessionResponse = await checkSession();
 
-    if (!session.success && isPrivateRoute) {
+    const setCookie = sessionResponse.headers['set-cookie'];
+
+    if (setCookie) {
+      const cookiesArray = Array.isArray(setCookie)
+        ? setCookie
+        : [setCookie];
+
+      for (const cookie of cookiesArray) {
+        response.headers.append('Set-Cookie', cookie);
+      }
+    }
+  } catch {
+    if (isPrivateRoute) {
       return NextResponse.redirect(
         new URL('/sign-in', request.url)
       );
     }
   }
+}
 
   if (!accessToken && isPrivateRoute) {
     return NextResponse.redirect(
@@ -42,7 +56,7 @@ export async function proxy(request: NextRequest) {
     );
   }
 
-  return NextResponse.next();
+ return response;
 }
 
 export const config = {

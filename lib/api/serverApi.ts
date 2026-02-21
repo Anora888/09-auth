@@ -1,47 +1,36 @@
-import axios from 'axios';
-import { cookies, headers } from 'next/headers';
+import { api } from './api';
+import { cookies } from 'next/headers';
 import type { User } from '@/types/user';
 import type { Note } from '@/types/note';
 
-async function getBaseURL() {
-  const host = (await headers()).get('host');
-  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-  return `${protocol}://${host}/api`;
-}
-
-async function getHeaders() {
+async function getCookieHeader() {
   const cookieStore = await cookies();
 
-  const cookieHeader = cookieStore
+  return cookieStore
     .getAll()
     .map(cookie => `${cookie.name}=${cookie.value}`)
     .join('; ');
+}
+
+async function withAuth() {
+  const cookieHeader = await getCookieHeader();
 
   return {
-    Cookie: cookieHeader,
+    headers: {
+      Cookie: cookieHeader,
+    },
   };
 }
 
 export async function getMe(): Promise<User> {
-  const baseURL = await getBaseURL();
-  const headersObj = await getHeaders();
-
-  const { data } = await axios.get<User>(
-    `${baseURL}/users/me`,
-    { headers: headersObj }
-  );
-
+  const config = await withAuth();
+  const { data } = await api.get<User>('/users/me', config);
   return data;
 }
+
 export async function fetchNoteById(id: string): Promise<Note> {
-  const baseURL = await getBaseURL();
-  const headersObj = await getHeaders();
-
-  const { data } = await axios.get<Note>(
-    `${baseURL}/notes/${id}`,
-    { headers: headersObj }
-  );
-
+  const config = await withAuth();
+  const { data } = await api.get<Note>(`/notes/${id}`, config);
   return data;
 }
 
@@ -51,13 +40,20 @@ export async function fetchNotes(params: {
   search?: string;
   tag?: string;
 }) {
-  const baseURL = await getBaseURL();
-  const headersObj = await getHeaders();
-
-  const { data } = await axios.get(
-    `${baseURL}/notes`,
-    { params, headers: headersObj }
-  );
-
+  const config = await withAuth();
+  const { data } = await api.get('/notes', {
+    ...config,
+    params,
+  });
   return data;
+}
+
+export async function checkSession(): Promise<{ success: boolean }> {
+  try {
+    const config = await withAuth();
+    await api.get('/auth/session', config);
+    return { success: true };
+  } catch {
+    return { success: false };
+  }
 }

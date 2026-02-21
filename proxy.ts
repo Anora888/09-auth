@@ -19,44 +19,48 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/profile') ||
     pathname.startsWith('/notes');
 
-   const response = NextResponse.next();
-if (!accessToken && refreshToken) {
-  try {
-    const sessionResponse = await checkSession();
+  const response = NextResponse.next();
 
-    const setCookie = sessionResponse.headers['set-cookie'];
+  let isAuthenticated = !!accessToken;
 
-    if (setCookie) {
-      const cookiesArray = Array.isArray(setCookie)
-        ? setCookie
-        : [setCookie];
+  if (!accessToken && refreshToken) {
+    try {
+      const sessionResponse = await checkSession();
+      const setCookie = sessionResponse.headers['set-cookie'];
 
-      for (const cookie of cookiesArray) {
-        response.headers.append('Set-Cookie', cookie);
+      if (setCookie) {
+        const cookiesArray = Array.isArray(setCookie)
+          ? setCookie
+          : [setCookie];
+
+        for (const cookie of cookiesArray) {
+          response.headers.append('Set-Cookie', cookie);
+        }
+
+        isAuthenticated = true;
+      }
+    } catch {
+      if (isPrivateRoute) {
+        return NextResponse.redirect(
+          new URL('/sign-in', request.url)
+        );
       }
     }
-  } catch {
-    if (isPrivateRoute) {
-      return NextResponse.redirect(
-        new URL('/sign-in', request.url)
-      );
-    }
   }
-}
 
-  if (!accessToken && isPrivateRoute) {
+  if (!isAuthenticated && isPrivateRoute) {
     return NextResponse.redirect(
       new URL('/sign-in', request.url)
     );
   }
 
-  if (accessToken && isAuthRoute) {
+  if (isAuthenticated && isAuthRoute) {
     return NextResponse.redirect(
-      new URL('/profile', request.url)
+      new URL('/', request.url)
     );
   }
 
- return response;
+  return response;
 }
 
 export const config = {
